@@ -53,3 +53,42 @@
          (map (partial every? true?))
          (some true?)
          ((complement nil?)))))
+
+;; palindromic numbers (#150)
+
+(defn is-palin? [n]
+  (let [size (Math/ceil (Math/log10 n))
+        is-length-odd? (odd? (int size))]
+    (loop [rnums [] n n thurk (int (/ size 2))]
+      (cond (zero? n) (empty? rnums)
+            (and (zero? thurk) is-length-odd?) (recur rnums (quot n 10) (dec thurk))
+            (zero? thurk) (recur rnums n (dec thurk))
+            (< thurk 0) (if (= (peek rnums) (rem n 10))
+                          (recur (pop rnums) (quot n 10) thurk)
+                          false)
+            :else (recur (conj rnums (rem n 10)) (quot n 10) (dec thurk))))))
+
+(defn palins [n]
+  (letfn [(is-palin? [n]
+            (if (< n 10) true
+              (let [size (Math/ceil (Math/log10 n))
+                    is-length-odd? (odd? (int size))]
+                (loop [rnums [] n n thurk (int (/ size 2))]
+                  (cond (zero? n) (empty? rnums)
+                        (and (zero? thurk) is-length-odd?) (recur rnums (quot n 10) (dec thurk))
+                        (zero? thurk) (recur rnums n (dec thurk))
+                        (< thurk 0) (if (= (peek rnums) (rem n 10))
+                                      (recur (pop rnums) (quot n 10) thurk)
+                                      false)
+                        :else (recur (conj rnums (rem n 10)) (quot n 10) (dec thurk)))))))]
+    (filter is-palin? (iterate inc n))))
+
+(defn pal-seq [n]
+  (letfn [(is-palin? [n]
+            (if (< n 10) true
+              (when-not (zero? (mod n 10))
+                (loop [r 0 j n]
+                  (if (zero? j) (= n r)
+                    (recur (+ (* 10 r) (mod j 10)) (quot j 10)))))))]
+    (filter is-palin? (iterate inc n))))
+          
